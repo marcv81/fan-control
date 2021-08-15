@@ -1,0 +1,13 @@
+[Unit]
+Description=Fan control
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/fan_control.py
+User=pwm
+Group=pwm
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
