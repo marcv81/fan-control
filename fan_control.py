@@ -14,6 +14,9 @@ MAX_TEMP = 45
 MIN_SPEED = 20
 MAX_SPEED = 100
 
+# EWMA filter coefficient
+ALPHA = 0.1
+
 
 class Sensor:
     """Temperature sensor."""
@@ -68,7 +71,7 @@ class PWM:
 class Controller:
     """Converts temperatures to fan speeds. Uses a linear saturated fan curve."""
 
-    def __init__(self, min_temp: float, max_temp: float, min_speed: float, max_speed: float) -> None:
+    def __init__(self, min_temp: float, max_temp: float, min_speed: float, max_speed: float, alpha: float) -> None:
         assert max_temp > min_temp
         assert max_speed > min_speed
         self._min_temp = min_temp
@@ -76,19 +79,24 @@ class Controller:
         self._min_speed = min_speed
         self._max_speed = max_speed
         self._ratio = (max_speed - min_speed) / (max_temp - min_temp)
+        self._alpha = alpha
 
     def get_speed(self, temp: float) -> float:
         """Converts a temperature to a fan speed."""
-        if temp < self._min_temp:
+        if not hasattr(self, "_temp"):
+            self._temp = temp
+        else:
+            self._temp = self._alpha * temp + (1 - self._alpha) * self._temp
+        if self._temp < self._min_temp:
             return self._min_speed
-        if temp > self._max_temp:
+        if self._temp > self._max_temp:
             return self._max_speed
-        return self._min_speed + self._ratio * (temp - self._min_temp)
+        return self._min_speed + self._ratio * (self._temp - self._min_temp)
 
 
 if __name__ == "__main__":
     sensor = Sensor(THERMAL_ZONE)
-    controller = Controller(MIN_TEMP, MAX_TEMP, MIN_SPEED, MAX_SPEED)
+    controller = Controller(MIN_TEMP, MAX_TEMP, MIN_SPEED, MAX_SPEED, ALPHA)
     pwm = PWM(chip=PWM_CHIP, channel=PWM_CHANNEL, period=40000)
     pwm.init()
     while True:
