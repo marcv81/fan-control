@@ -3,13 +3,15 @@
 import os.path
 import time
 
-# Configuration
+# Devices
 THERMAL_ZONE = 0
 PWM_CHIP = 0
 PWM_CHANNEL = 0
-MIN_TEMP = 40
-MAX_TEMP = 55
-MIN_SPEED = 30
+
+# Fan curve
+MIN_TEMP = 30
+MAX_TEMP = 45
+MIN_SPEED = 20
 MAX_SPEED = 100
 
 
