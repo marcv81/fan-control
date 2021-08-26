@@ -13,10 +13,16 @@ MIN_SPEED = 30
 MAX_SPEED = 100
 
 
-def read_temp() -> float:
-    """Reads the temperature."""
-    with open("/sys/class/thermal/thermal_zone%d/temp" % THERMAL_ZONE) as f:
-        return int(f.readline()) / 1000
+class Sensor:
+    """Temperature sensor."""
+
+    def __init__(self, thermal_zone: int) -> None:
+        self._thermal_zone = thermal_zone
+
+    def read_temp(self) -> float:
+        """Reads the temperature."""
+        with open("/sys/class/thermal/thermal_zone%d/temp" % self._thermal_zone) as f:
+            return int(f.readline()) / 1000
 
 
 class PWM:
@@ -79,11 +85,12 @@ class Controller:
 
 
 if __name__ == "__main__":
+    sensor = Sensor(THERMAL_ZONE)
     controller = Controller(MIN_TEMP, MAX_TEMP, MIN_SPEED, MAX_SPEED)
     pwm = PWM(chip=PWM_CHIP, channel=PWM_CHANNEL, period=40000)
     pwm.init()
     while True:
-        temp = read_temp()
+        temp = sensor.read_temp()
         percent = controller.get_speed(temp)
         pwm.update(percent)
         time.sleep(1)
