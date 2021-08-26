@@ -2,7 +2,6 @@
 
 import os.path
 import time
-import unittest
 
 # Configuration
 THERMAL_ZONE = 0
@@ -77,18 +76,6 @@ class Controller:
         if temperature > self._max_temperature:
             return self._max_speed
         return self._min_speed + self._ratio * (temperature - self._min_temperature)
-
-
-class TestController(unittest.TestCase):
-    """Controller unit tests."""
-
-    def test_get_speed(self) -> None:
-        controller = Controller(min_temperature=40, max_temperature=60, min_speed=50, max_speed=100)
-        self.assertEqual(controller.get_speed(temperature=30), 50)
-        self.assertEqual(controller.get_speed(temperature=40), 50)
-        self.assertEqual(controller.get_speed(temperature=50), 75)
-        self.assertEqual(controller.get_speed(temperature=60), 100)
-        self.assertEqual(controller.get_speed(temperature=70), 100)
 
 
 if __name__ == "__main__":

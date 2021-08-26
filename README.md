@@ -59,7 +59,7 @@ Setup a virtualenv with the dev tools.
     source venv/bin/activate
     pip3 install -r requirements.txt
 
-Run the static analysis and the unit tests.
+Run the static analysis.
 
     ./test.sh
 
