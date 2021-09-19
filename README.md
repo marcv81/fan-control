@@ -1,10 +1,14 @@
 # Fan control
 
-Controls a fan speed according to a temperature sensor. Tested on a Raspberry Pi 4 running Ubuntu Groovy.
+This project controls a fan speed according to a temperature sensor. It relies on pwmchip sysfs to control the fan speed, and on thermal sysfs to read the temperature.
+
+Tested on a Raspberry Pi 4 running Ubuntu Groovy.
 
 ## Configuration
 
 ### Enable PWM
+
+The Raspberry Pi hardware PWM is not enabled by default.
 
 Edit `/boot/firmware/config.txt`.
 
@@ -43,6 +47,11 @@ Copy `fan_control.py` to `/usr/local/bin/fan_control.py`.
 
 Configure the thermal zone, the hardware PWM, and the fan curve directly in `/usr/local/bin/fan_control.py`.
 
+The fan curve is
+- constant for temperatures lower than MIN_TEMP
+- constant for temperatures higher than MAX_TEMP
+- linear for temperatures between MIN_TEMP and MAX_TEMP
+
 Copy `fan-control.service` to `/etc/systemd/system/fan-control.service`.
 
 Configure systemd.
@@ -53,7 +62,7 @@ Configure systemd.
 
 ## Hacking
 
-Setup a virtualenv with the dev tools.
+Setup a virtualenv. This is only required for the dev tools, not to run the service.
 
     virtualenv -p python3 venv
     source venv/bin/activate
